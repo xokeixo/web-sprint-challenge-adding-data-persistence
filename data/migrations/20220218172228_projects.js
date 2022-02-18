@@ -4,44 +4,52 @@
  */
 exports.up = async function(knex) {
     await knex.schema
-    .createTable('projects', table => {
+    .createTable('projects', (table) => {
         table.increments('project_id')
-        table.string('project_name', 128).notNull()
-        table.text('project_description', 512)
-        table.boolean('project_completed').defaultTo(0)
+        table.string('project_name', 128)
+            .notNullable()
+        table.string('project_description', 255)
+        table.boolean('project_completed')
+            .defaultTo(false)
     })
-    .createTable('resources', table => {
+    .createTable('resources', (table) => {
         table.increments('resource_id')
-        table.string('resource_name', 128).notNull().unique()
-        table.text('resource_description', 512)
+        table.string('resource_name', 128)
+            .notNullable()
+            .unique()
+        table.string('resource_description', 255)
     })
-    .createTable('tasks', table => {
+    .createTable('tasks', (table) => {
         table.increments('task_id')
-        table.text('task_description', 512).notNull()
-        table.text('task_notes', 512)
-        table.boolean('task_completed').defaultTo(0)
-        table
-            .integer('project_id')
+        table.string('task_description', 255)
+            .notNullable()
+        table.string('task_notes', 255)
+        table.boolean('task_completed')
+            .defaultTo(false)
+        table.integer('project_id')
             .unsigned()
-            .notNull()
+            .notNullable()
             .references('project_id')
             .inTable('projects')
-            .onDelete('CASCADE')
-            .onUpdate('CASCADE')
+            .onDelete('RESTRICT')
+            .onUpdate('RESTRICT')
     })
-    .createTable('project_resources', table => {
-        table
-            .integer('project_id')
+    .createTable('project_resources', (table) => {
+        table.increments('project_resource_id')
+        table.integer('project_id')
+            .notNullable()
             .unsigned()
-            .notNull()
             .references('project_id')
             .inTable('projects')
-        table
-            .integer('resource_id')
+            .onDelete('RESTRICT')
+            .onUpdate('RESTRICT')
+        table.integer('resource_id')
+            .notNullable()
             .unsigned()
-            .notNull()
             .references('resource_id')
             .inTable('resources')
+            .onDelete('RESTRICT')
+            .onUpdate('RESTRICT')
     })
 };
 
